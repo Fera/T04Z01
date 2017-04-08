@@ -4,7 +4,9 @@ var gulp = require("gulp"),
 	plumber = require("gulp-plumber"),
 	browserSync = require("browser-sync"),
 	del = require("del"),
-	useref = require("gulp-useref");
+	useref = require("gulp-useref"),
+	uglify = require("gulp-uglify"),
+	gulpif = require("gulp-if");
 
 gulp.task("hello", function(){
 	console.log("hello");
@@ -45,6 +47,7 @@ gulp.task("html", function(){
 
 	gulp.src('src/*.html')
 		.pipe(useref())
+		.pipe(gulpif('*.js',uglify()))
 		.pipe(gulp.dest('dist'));
 });
 
