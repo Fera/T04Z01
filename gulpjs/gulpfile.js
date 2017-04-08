@@ -8,13 +8,18 @@ var gulp = require("gulp"),
 	uglify = require("gulp-uglify"),
 	gulpif = require("gulp-if"),
 	imagemin = require("gulp-imagemin"),
-	runSequence = require("run-sequence");
+	runSequence = require("run-sequence"),
+	ftp = require("vinyl-ftp"),
+	argv = require("yargs").argv,
+	gutil = require("gulp-util");
 
 gulp.task("hello", function(){
 	console.log("hello");
 });
 
 gulp.task("css", function(){
+
+	gutil.log(gutil.colors.yellow('Kompilacja SASS do CSS...'));
 
 	return gulp.src("src/sass/main.scss")
 		.pipe(plumber())
@@ -70,9 +75,24 @@ gulp.task("copy", function(){
 		.pipe(gulp.dest('dist'));
 });
 
+gulp.task("upload", function(){
+
+	var conn = ftp.create({
+		host: 'ftp.mojastrona.pl',
+		user: 'nazwa_uzytkownika',
+		password: 'haslo',
+
+
+	});
+
+	return gulp.src('dist/**/*')
+		.pipe(gulpif(argv.upload, conn.dest('/public_html/app')));
+
+});
+
 gulp.task("build", function(cb){
 
-	runSequence("clean", "html", "copy", "images", cb);
+	runSequence("clean", "html", "copy", "images", "upload", cb);
 });
 
 gulp.task("build:server",["build"], function(){
