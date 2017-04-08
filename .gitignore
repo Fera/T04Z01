@@ -1,0 +1,4 @@
+*.txt
+!README.txt
+
+node_modules/
