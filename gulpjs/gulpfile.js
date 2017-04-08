@@ -6,7 +6,8 @@ var gulp = require("gulp"),
 	del = require("del"),
 	useref = require("gulp-useref"),
 	uglify = require("gulp-uglify"),
-	gulpif = require("gulp-if");
+	gulpif = require("gulp-if"),
+	imagemin = require("gulp-imagemin");
 
 gulp.task("hello", function(){
 	console.log("hello");
@@ -48,6 +49,23 @@ gulp.task("html", function(){
 	gulp.src('src/*.html')
 		.pipe(useref())
 		.pipe(gulpif('*.js',uglify()))
+		.pipe(gulp.dest('dist'));
+});
+
+gulp.task("images", function(){
+
+	gulp.src('dist/images/*', {
+		base: 'dist'
+	})
+		.pipe(imagemin())
+		.pipe(gulp.dest('dist'));
+});
+
+gulp.task("copy", function(){
+
+	gulp.src(['src/css/**/*.css', 'src/images/*', 'src/uploads/*'], {
+		base: 'src'
+	})
 		.pipe(gulp.dest('dist'));
 });
 
