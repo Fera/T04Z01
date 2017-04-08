@@ -1,17 +1,21 @@
 var gulp = require("gulp"),
-	sass = require("gulp-sass"),
-	autoprefixer = require("gulp-autoprefixer"),
-	plumber = require("gulp-plumber"),
+	$ = require("gulp-load-plugins")({
+		lazy: true
+	}),
+	// sass = require("gulp-sass"),
+	// autoprefixer = require("gulp-autoprefixer"),
+	// plumber = require("gulp-plumber"),
 	browserSync = require("browser-sync"),
 	del = require("del"),
-	useref = require("gulp-useref"),
-	uglify = require("gulp-uglify"),
-	gulpif = require("gulp-if"),
-	imagemin = require("gulp-imagemin"),
+	// useref = require("gulp-useref"),
+	// uglify = require("gulp-uglify"),
+	// gulpif = require("gulp-if"),
+	// imagemin = require("gulp-imagemin"),
 	runSequence = require("run-sequence"),
 	ftp = require("vinyl-ftp"),
-	argv = require("yargs").argv,
-	gutil = require("gulp-util");
+	argv = require("yargs").argv;
+	// gutil = require("gulp-util");
+
 
 gulp.task("hello", function(){
 	console.log("hello");
@@ -19,12 +23,12 @@ gulp.task("hello", function(){
 
 gulp.task("css", function(){
 
-	gutil.log(gutil.colors.yellow('Kompilacja SASS do CSS...'));
+	$.util.log($.util.colors.yellow('Kompilacja SASS do CSS...'));
 
 	return gulp.src("src/sass/main.scss")
-		.pipe(plumber())
-		.pipe(sass.sync()) //jeśli ma dobrze działać z plumber musi być sass.sync
-		.pipe(autoprefixer({
+		.pipe($.plumber())
+		.pipe($.sass.sync()) //jeśli ma dobrze działać z plumber musi być sass.sync
+		.pipe($.autoprefixer({
 			browsers: ["last 5 version", "IE 9"]
 		}))
 		.pipe(gulp.dest("src/css"))
@@ -53,8 +57,8 @@ gulp.task("clean", function(){
 gulp.task("html", function(){
 
 	return gulp.src('src/*.html')
-		.pipe(useref())
-		.pipe(gulpif('*.js',uglify()))
+		.pipe($.useref())
+		.pipe($.if('*.js',$.uglify()))
 		.pipe(gulp.dest('dist'));
 });
 
@@ -63,7 +67,7 @@ gulp.task("images", function(){
 	return gulp.src('dist/images/*', {
 		base: 'dist'
 	})
-		.pipe(imagemin())
+		.pipe($.imagemin())
 		.pipe(gulp.dest('dist'));
 });
 
@@ -86,7 +90,7 @@ gulp.task("upload", function(){
 	});
 
 	return gulp.src('dist/**/*')
-		.pipe(gulpif(argv.upload, conn.dest('/public_html/app')));
+		.pipe($.if(argv.upload, conn.dest('/public_html/app')));
 
 });
 
