@@ -7,7 +7,8 @@ var gulp = require("gulp"),
 	useref = require("gulp-useref"),
 	uglify = require("gulp-uglify"),
 	gulpif = require("gulp-if"),
-	imagemin = require("gulp-imagemin");
+	imagemin = require("gulp-imagemin"),
+	runSequence = require("run-sequence");
 
 gulp.task("hello", function(){
 	console.log("hello");
@@ -15,7 +16,7 @@ gulp.task("hello", function(){
 
 gulp.task("css", function(){
 
-	gulp.src("src/sass/main.scss")
+	return gulp.src("src/sass/main.scss")
 		.pipe(plumber())
 		.pipe(sass.sync()) //jeśli ma dobrze działać z plumber musi być sass.sync
 		.pipe(autoprefixer({
@@ -41,12 +42,12 @@ gulp.task("watch", function(){
 });
 
 gulp.task("clean", function(){
-	del("dist/");
+	return del("dist/");
 });
 
 gulp.task("html", function(){
 
-	gulp.src('src/*.html')
+	return gulp.src('src/*.html')
 		.pipe(useref())
 		.pipe(gulpif('*.js',uglify()))
 		.pipe(gulp.dest('dist'));
@@ -54,7 +55,7 @@ gulp.task("html", function(){
 
 gulp.task("images", function(){
 
-	gulp.src('dist/images/*', {
+	return gulp.src('dist/images/*', {
 		base: 'dist'
 	})
 		.pipe(imagemin())
@@ -63,10 +64,22 @@ gulp.task("images", function(){
 
 gulp.task("copy", function(){
 
-	gulp.src(['src/css/**/*.css', 'src/images/*', 'src/uploads/*'], {
+	return gulp.src(['src/css/**/*.css', 'src/images/*', 'src/uploads/*'], {
 		base: 'src'
 	})
 		.pipe(gulp.dest('dist'));
+});
+
+gulp.task("build", function(cb){
+
+	runSequence("clean", "html", "copy", "images", cb);
+});
+
+gulp.task("build:server",["build"], function(){
+
+	browserSync.init({
+		server: 'dist'
+	});
 });
 
 gulp.task("default", ["css", "server", "watch"]);
